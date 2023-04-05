@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define NUM_FEATURES 5
-#define NUM_POINTS 9
+#define NUM_FEATURES 3 // Number of features in the data
+#define NUM_POINTS 6 // Number of points in the training data
 
 struct Point {
     float features[NUM_FEATURES];
@@ -39,7 +39,7 @@ void knn_fit(struct knn* model, struct Point* train_data) {
 }
 
 char knn_predict(struct knn* model, float* new_point) {
-    float distances[model->num_points];
+    float* distances = (float*) malloc(model->num_points * sizeof(float));
 
     for (int i = 0; i < model->num_points; i++) {
         distances[i] = euclidean_distance(model->train_data[i].features, new_point);
@@ -58,9 +58,10 @@ char knn_predict(struct knn* model, float* new_point) {
             }
         }
     }
+    free(distances);
 
     // Count the votes for each label among the k nearest neighbors
-    char votes[model->k];
+    char* votes = (char*) malloc(model->k * sizeof(char));
     for (int i = 0; i < model->k; i++) {
         votes[i] = model->train_data[i].label;
     }
@@ -78,7 +79,7 @@ char knn_predict(struct knn* model, float* new_point) {
             result = votes[i];
         }
     }
-
+    free(votes);
     return result;
 }
 
